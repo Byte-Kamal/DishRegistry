@@ -1,3 +1,5 @@
+# pylint: disable=missing-docstring
+
 from django.contrib import admin
 
 from .models import Recipe, Review
