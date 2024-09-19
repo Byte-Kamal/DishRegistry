@@ -1,7 +1,6 @@
 from django.contrib.auth.models import AbstractUser, BaseUserManager
 from django.db import models
 
-
 class CustomUserManager(BaseUserManager):
     def create_user(self, email, password=None, **extra_fields):
         if not email:
@@ -23,10 +22,9 @@ class CustomUserManager(BaseUserManager):
 
         return self.create_user(email, password, **extra_fields)
 
-
 class CustomUser(AbstractUser):
-    username = None  # Remove the username field
-    email = models.EmailField(unique=True)  # Use email as the unique identifier
+    username = None
+    email = models.EmailField(unique=True)
     name = models.CharField(max_length=255, null=True, blank=True)
 
     ROLE_CHOICES = [

@@ -5,6 +5,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.views import TokenObtainPairView
+from django.contrib.auth.models import Group
 
 from .serializers import (
     CustomTokenObtainPairSerializer,
@@ -19,19 +20,19 @@ class RegisterView(APIView):
         serializer = RegisterSerializer(data=request.data)
         if serializer.is_valid():
             result = serializer.save()
+            user = result['user']
+            
             return Response(
                 {
                     "user": {
-                        "id": result["user"].id,
-                        "name": result["user"].name,
-                        "email": result["user"].email,
-                        "role": result["user"].role,
-                        "bio": result["user"].bio,
-                        "profile_picture": result["user"].profile_picture.url
-                        if result["user"].profile_picture
-                        else None,
+                        "id": user.id,
+                        "name": user.name,
+                        "email": user.email,
+                        "role": user.role,  # Use the role field directly
+                        "bio": user.bio if hasattr(user, 'bio') else None,
+                        "profile_picture": user.profile_picture.url if hasattr(user, 'profile_picture') and user.profile_picture else None,
                     },
-                    "token": result["token"],
+                    "token": result['token'],
                 },
                 status=status.HTTP_201_CREATED,
             )
