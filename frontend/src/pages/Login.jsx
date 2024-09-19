@@ -1,12 +1,10 @@
 import axios from "axios";
 import { useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import { useAuth } from "../contexts/AuthContext";
 
 const Login = () => {
   const emailRef = useRef(null);
   const passwordRef = useRef(null);
-  const { login } = useAuth();
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
@@ -28,10 +26,13 @@ const Login = () => {
           },
         },
       );
-
-      const { access, user } = response.data;
-      console.log("Login response user data:", user);
-
+      console.log("Login response:", response.data);
+    
+      // Extract access and refresh tokens from the response
+      const { access, refresh } = response.data;
+      console.log("Access token:", access);
+      console.log("Refresh token:", refresh);
+    
       // Fetch profile data
       const profileResponse = await axios.get(
         "http://localhost:8000/api/profile/",
@@ -41,51 +42,21 @@ const Login = () => {
           },
         },
       );
+      console.log("Profile response:", profileResponse.data);
 
-      const profileData = profileResponse.data;
-      console.log("Profile data:", profileData);
-
-      const {
-        name,
-        email,
-        is_cook,
-        is_planner,
-        is_food_enthusiast,
-        is_administrator,
-        bio,
-        profile,
-      } = profileData;
-
-      console.log("Name:", name);
-      console.log("Email:", email);
-      console.log("Is Cook:", is_cook);
-      console.log("Is Planner:", is_planner);
-      console.log("Is Food Enthusiast:", is_food_enthusiast);
-      console.log("Is Admin:", is_administrator);
-      console.log("Bio:", bio);
-      console.log("Profile:", profile);
-
-      // Determine the role
-      const role = is_cook
-        ? "cooks"
-        : is_planner
-          ? "planners"
-          : is_food_enthusiast
-            ? "users"
-            : is_administrator
-              ? "admin"
-              : "unknown";
-      console.log("Role:", role);
-
-      // Login and set the user group
-      login(role);
+      localStorage.setItem("userGroup", profileResponse.data.role);
+      localStorage.setItem("accessToken", access);
+      localStorage.setItem("refreshToken", refresh);
 
       navigate("/");
     } catch (error) {
-      console.error("Login error:", error);
+      if (error.response) {
+        console.error("Error response:", error.response.data);
+      } else {
+        console.error("Error:", error.message);
+      }
     }
-  };
-
+  }
   return (
     <div className="flex items-center justify-center h-screen bg-gray-900">
       <div className="relative flex w-full max-w-4xl h-[500px] bg-gray-800 shadow-lg rounded-lg overflow-hidden">
@@ -103,6 +74,7 @@ const Login = () => {
               id="email"
               ref={emailRef}
               className="p-2 mb-4 text-white bg-gray-700 border border-gray-600 rounded"
+              required
             />
             <label htmlFor="password" className="mb-2">
               Password
@@ -112,6 +84,7 @@ const Login = () => {
               id="password"
               ref={passwordRef}
               className="p-2 mb-4 text-white bg-gray-700 border border-gray-600 rounded"
+              required
             />
             <button
               type="submit"

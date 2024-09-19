@@ -6,7 +6,7 @@ const Register = () => {
   const nameRef = useRef(null);
   const emailRef = useRef(null);
   const passwordRef = useRef(null);
-  const groupRef = useRef(null);
+  const roleRef = useRef(null);
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
@@ -16,7 +16,7 @@ const Register = () => {
       name: nameRef.current.value,
       email: emailRef.current.value,
       password: passwordRef.current.value,
-      group: groupRef.current.value,
+      role: roleRef.current.value,
     };
 
     try {
@@ -30,9 +30,10 @@ const Register = () => {
           },
         },
       );
-
-      if (response.data.message === "User created successfully") {
-        alert("Please Login");
+      console.log("Registration response:", response.data);
+    
+      if (response.data.user && response.data.token) {
+        alert("Registration successful! Please Login.");
         navigate("/login");
       } else {
         console.error("Unexpected response:", response.data);
@@ -88,19 +89,15 @@ const Register = () => {
               required
             />
             <label htmlFor="group" className="mb-2">
-              Group
+              Role
             </label>
-            <select
-              id="group"
-              ref={groupRef}
-              className="p-2 mb-4 text-white bg-gray-700 border border-gray-600 rounded"
-              required
+            <select ref={roleRef} required className="p-2 mb-4 text-white bg-gray-700 border border-gray-600 rounded"
             >
-              <option value="Users">User</option>
-              <option value="Cooks">Cook</option>
-              <option value="Planners">Planner</option>
-              <option value="Admin">Admin</option>
-            </select>
+            <option value="Admin">Admin</option>
+            <option value="Cooks">Cook</option>
+            <option value="Planners">Planner</option>
+            <option value="Users">Users</option>
+          </select>
             <button
               type="submit"
               className="p-2 mb-6 text-white bg-blue-500 rounded"
