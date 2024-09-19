@@ -1,0 +1,16 @@
+[tool.poetry]
+name = "dishregistry"
+version = "0.1.0"
+description = "DishRegistry is a curated platform for discovering, organizing, and sharing diverse recipes, making it easy for users to explore and personalize their culinary journey."
+authors = ["Kamal Dhital"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.12"
+django = "^5.1.1"
+djangorestframework = "^3.15.2"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
