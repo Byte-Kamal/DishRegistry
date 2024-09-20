@@ -1,16 +1,33 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
+import Dashboard from "../components/AdminDashboard/Dashboard";
+import RecipeManagement from "../components/AdminDashboard/RecipeManagement";
+import RecipeReviews from "../components/AdminDashboard/RecipeReviews";
+import UserManagement from "../components/AdminDashboard/UserManagement";
+import { RecipeContext } from "../contexts/RecipeContext";
+import { ReviewContext } from "../contexts/ReviewContext";
+import { UserContext } from "../contexts/UserContext";
+
 
 const AdminDashboard = () => {
+  const { recipes, loadingRecipe } = useContext(RecipeContext);
+  const { reviews, loadingReview } = useContext(ReviewContext);
+  const { users, loadingUser } = useContext(UserContext);
+
   const [activeSection, setActiveSection] = useState("Dashboard");
+
+  if (loadingRecipe) return <p>Loading recipes...</p>;
+  if (loadingReview) return <p>Loading reviews...</p>;
+  if (loadingUser) return <p>Loading users...</p>;
+
 
   const renderSection = () => {
     switch (activeSection) {
       case "UserManagement":
-        return <UserManagement />;
+        return <UserManagement users={users}/>;
       case "RecipeManagement":
-        return <RecipeManagement />;
+        return <RecipeManagement recipes={recipes}/>;
       case "RecipeReviews":
-        return <RecipeReviews />;
+        return <RecipeReviews reviews={reviews}/>;
       case "Dashboard":
         return <Dashboard setActiveSection={setActiveSection} />;
       default:
@@ -52,217 +69,6 @@ const AdminDashboard = () => {
         </div>
         <div className="w-3/4 p-4">{renderSection()}</div>
       </div>
-    </div>
-  );
-};
-
-const Dashboard = ({ setActiveSection }) => (
-  <div>
-    <h3 className="text-xl mb-4">Dashboard</h3>
-    <div className="grid grid-cols-3 gap-4 mb-8">
-      <div className="bg-gray-700 p-4 rounded">
-        <h4 className="text-lg">Total Users</h4>
-        <p className="text-2xl">150</p>
-      </div>
-      <div className="bg-gray-700 p-4 rounded">
-        <h4 className="text-lg">Total Recipes</h4>
-        <p className="text-2xl">75</p>
-      </div>
-      <div className="bg-gray-700 p-4 rounded">
-        <h4 className="text-lg">Total Reviews</h4>
-        <p className="text-2xl">300</p>
-      </div>
-    </div>
-    <div>
-      <h4 className="text-lg mb-2">Recent Users</h4>
-      <UserManagement limit={10} />
-      <button
-        className="bg-blue-500 text-white px-4 py-2 mt-2"
-        onClick={() => setActiveSection("UserManagement")}
-      >
-        View More
-      </button>
-    </div>
-    <div className="mt-8">
-      <h4 className="text-lg mb-2">Recent Recipes</h4>
-      <RecipeManagement limit={10} />
-      <button
-        className="bg-blue-500 text-white px-4 py-2 mt-2"
-        onClick={() => setActiveSection("RecipeManagement")}
-      >
-        View More
-      </button>
-    </div>
-    <div className="mt-8">
-      <h4 className="text-lg mb-2">Recent Reviews</h4>
-      <RecipeReviews limit={10} />
-      <button
-        className="bg-blue-500 text-white px-4 py-2 mt-2"
-        onClick={() => setActiveSection("RecipeReviews")}
-      >
-        View More
-      </button>
-    </div>
-  </div>
-);
-
-const UserManagement = ({ limit }) => {
-  const users = [
-    { id: 1, name: "John Doe", email: "john@example.com" },
-    // Add more user data as needed
-  ];
-
-  return (
-    <div>
-      <h3 className="text-xl mb-4">User Management</h3>
-      <table className="min-w-full bg-gray-800 text-white border-collapse">
-        <thead>
-          <tr>
-            <th className="py-2 px-4 border border-gray-700 text-left">ID</th>
-            <th className="py-2 px-4 border border-gray-700 text-left">Name</th>
-            <th className="py-2 px-4 border border-gray-700 text-left">
-              Email
-            </th>
-            <th className="py-2 px-4 border border-gray-700 text-left">
-              Actions
-            </th>
-          </tr>
-        </thead>
-        <tbody>
-          {users.slice(0, limit).map((user) => (
-            <tr key={user.id}>
-              <td className="py-2 px-4 border border-gray-700">{user.id}</td>
-              <td className="py-2 px-4 border border-gray-700">{user.name}</td>
-              <td className="py-2 px-4 border border-gray-700">{user.email}</td>
-              <td className="py-2 px-4 border border-gray-700">
-                <button className="bg-blue-500 text-white px-2 py-1 mr-2">
-                  View
-                </button>
-                <button className="bg-yellow-500 text-white px-2 py-1 mr-2">
-                  Edit
-                </button>
-                <button className="bg-red-500 text-white px-2 py-1">
-                  Delete
-                </button>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
-  );
-};
-
-const RecipeManagement = ({ limit }) => {
-  const recipes = [
-    { id: 1, title: "Spaghetti Bolognese", author: "Jane Doe" },
-    // Add more recipe data as needed
-  ];
-
-  return (
-    <div>
-      <h3 className="text-xl mb-4">Recipe Management</h3>
-      <table className="min-w-full bg-gray-800 text-white border-collapse">
-        <thead>
-          <tr>
-            <th className="py-2 px-4 border border-gray-700 text-left">ID</th>
-            <th className="py-2 px-4 border border-gray-700 text-left">
-              Title
-            </th>
-            <th className="py-2 px-4 border border-gray-700 text-left">
-              Author
-            </th>
-            <th className="py-2 px-4 border border-gray-700 text-left">
-              Actions
-            </th>
-          </tr>
-        </thead>
-        <tbody>
-          {recipes.slice(0, limit).map((recipe) => (
-            <tr key={recipe.id}>
-              <td className="py-2 px-4 border border-gray-700">{recipe.id}</td>
-              <td className="py-2 px-4 border border-gray-700">
-                {recipe.title}
-              </td>
-              <td className="py-2 px-4 border border-gray-700">
-                {recipe.author}
-              </td>
-              <td className="py-2 px-4 border border-gray-700">
-                <button className="bg-blue-500 text-white px-2 py-1 mr-2">
-                  View
-                </button>
-                <button className="bg-yellow-500 text-white px-2 py-1 mr-2">
-                  Edit
-                </button>
-                <button className="bg-red-500 text-white px-2 py-1">
-                  Delete
-                </button>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
-  );
-};
-
-const RecipeReviews = ({ limit }) => {
-  const reviews = [
-    {
-      id: 1,
-      recipe: "Spaghetti Bolognese",
-      reviewer: "John Smith",
-      review: "Delicious recipe!",
-    },
-    // Add more review data as needed
-  ];
-
-  return (
-    <div>
-      <h3 className="text-xl mb-4">Recipe Reviews</h3>
-      <table className="min-w-full bg-gray-800 text-white border-collapse">
-        <thead>
-          <tr>
-            <th className="py-2 px-4 border border-gray-700 text-left">ID</th>
-            <th className="py-2 px-4 border border-gray-700 text-left">
-              Recipe
-            </th>
-            <th className="py-2 px-4 border border-gray-700 text-left">
-              Reviewer
-            </th>
-            <th className="py-2 px-4 border border-gray-700 text-left">
-              Review
-            </th>
-            <th className="py-2 px-4 border border-gray-700 text-left">
-              Actions
-            </th>
-          </tr>
-        </thead>
-        <tbody>
-          {reviews.slice(0, limit).map((review) => (
-            <tr key={review.id}>
-              <td className="py-2 px-4 border border-gray-700">{review.id}</td>
-              <td className="py-2 px-4 border border-gray-700">
-                {review.recipe}
-              </td>
-              <td className="py-2 px-4 border border-gray-700">
-                {review.reviewer}
-              </td>
-              <td className="py-2 px-4 border border-gray-700">
-                {review.review}
-              </td>
-              <td className="py-2 px-4 border border-gray-700">
-                <button className="bg-blue-500 text-white px-2 py-1 mr-2">
-                  View
-                </button>
-                <button className="bg-red-500 text-white px-2 py-1">
-                  Delete
-                </button>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
     </div>
   );
 };

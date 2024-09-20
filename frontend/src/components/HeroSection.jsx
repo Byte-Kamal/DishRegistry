@@ -15,8 +15,8 @@ const HeroSection = () => {
               <h1 className="text-4xl font-bold text-white mb-4">
                 Welcome to Dish<span className="text-red-600">Registry</span>
               </h1>
-              <p className="text-lg text-white mb-4">
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+              <p className="text-lg text-white mb-4 text-justify mr-20">
+              DishRegistry is a curated platform for discovering, organizing, and sharing diverse recipes, making it easy for users to explore and personalize their culinary journey.
               </p>
               <Link to={"/recipes"}>
                 <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mb-4">

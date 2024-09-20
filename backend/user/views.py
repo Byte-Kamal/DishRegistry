@@ -6,7 +6,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.views import TokenObtainPairView
 from django.contrib.auth.models import Group
-
+from .models import CustomUser
 from .serializers import (
     CustomTokenObtainPairSerializer,
     RegisterSerializer,
@@ -94,3 +94,9 @@ class DeleteProfileView(APIView):
                 {"message": "Error deleting user"},
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR,
             )
+
+class AdminUserProfileView(APIView):
+  def get(self, request):
+    user_profiles = CustomUser.objects.all()
+    serializer = UserProfileSerializer(user_profiles, many=True)
+    return Response(serializer.data)
