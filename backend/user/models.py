@@ -1,6 +1,7 @@
 from django.contrib.auth.models import AbstractUser, BaseUserManager
 from django.db import models
 
+
 class CustomUserManager(BaseUserManager):
     def create_user(self, email, password=None, **extra_fields):
         if not email:
@@ -22,6 +23,7 @@ class CustomUserManager(BaseUserManager):
 
         return self.create_user(email, password, **extra_fields)
 
+
 class CustomUser(AbstractUser):
     username = None
     email = models.EmailField(unique=True)
@@ -39,6 +41,9 @@ class CustomUser(AbstractUser):
     profile_picture = models.ImageField(
         upload_to="profile_pictures/", null=True, blank=True
     )
+    contact_number = models.CharField(max_length=15, null=True, blank=True)
+    address = models.TextField(null=True, blank=True)
+    date_joined = models.DateField(auto_now_add=True)
 
     USERNAME_FIELD = "email"
     REQUIRED_FIELDS = ["name"]
@@ -46,4 +51,4 @@ class CustomUser(AbstractUser):
     objects = CustomUserManager()
 
     def __str__(self):
-        return self.email
+        return self.name

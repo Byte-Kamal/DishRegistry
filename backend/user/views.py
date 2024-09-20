@@ -1,11 +1,9 @@
-# pylint: disable=missing-docstring, abstract-method
-
 from rest_framework import status
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.views import TokenObtainPairView
-from django.contrib.auth.models import Group
+
 from .models import CustomUser
 from .serializers import (
     CustomTokenObtainPairSerializer,
@@ -20,19 +18,26 @@ class RegisterView(APIView):
         serializer = RegisterSerializer(data=request.data)
         if serializer.is_valid():
             result = serializer.save()
-            user = result['user']
-            
+            user = result["user"]
+
             return Response(
                 {
                     "user": {
                         "id": user.id,
                         "name": user.name,
                         "email": user.email,
-                        "role": user.role,  # Use the role field directly
-                        "bio": user.bio if hasattr(user, 'bio') else None,
-                        "profile_picture": user.profile_picture.url if hasattr(user, 'profile_picture') and user.profile_picture else None,
+                        "role": user.role,
+                        "bio": user.bio if hasattr(user, "bio") else None,
+                        "profile_picture": user.profile_picture.url
+                        if hasattr(user, "profile_picture") and user.profile_picture
+                        else None,
+                        "contact_number": user.contact_number
+                        if hasattr(user, "contact_number")
+                        else None,
+                        "address": user.address if hasattr(user, "address") else None,
+                        "date_joined": user.date_joined,
                     },
-                    "token": result['token'],
+                    "token": result["token"],
                 },
                 status=status.HTTP_201_CREATED,
             )
@@ -56,26 +61,42 @@ class CustomTokenObtainPairView(TokenObtainPairView):
         return super().post(request, *args, **kwargs)
 
 
-# View to fetch the logged-in user's profile information
 class UserProfileView(APIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticatedOrReadOnly]
 
     def get(self, request):
-        user = request.user
-        serializer = UserProfileSerializer(user)
-        return Response(serializer.data)
-
-
-class UserProfileUpdateView(APIView):
-    permission_classes = [IsAuthenticated]
-
-    def put(self, request):
-        user = request.user
-        serializer = UserProfileUpdateSerializer(user, data=request.data, partial=True)
-        if serializer.is_valid():
-            serializer.save()
+        if request.user.is_authenticated:
+            user = request.user
+            serializer = UserProfileSerializer(user)
             return Response(serializer.data)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        else:
+            return Response(
+                {"detail": "Authentication credentials were not provided."},
+                status=status.HTTP_401_UNAUTHORIZED,
+            )
+
+    def patch(self, request):
+        if request.user.is_authenticated:
+            user = request.user
+            serializer = UserProfileUpdateSerializer(
+                user, data=request.data, partial=True
+            )
+            if serializer.is_valid():
+                serializer.save()
+                return Response(serializer.data)
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        else:
+            return Response(
+                {"detail": "Authentication credentials were not provided."},
+                status=status.HTTP_401_UNAUTHORIZED,
+            )
+
+
+class AdminUserProfileView(APIView):
+    def get(self, request):
+        user_profiles = CustomUser.objects.all()
+        serializer = UserProfileSerializer(user_profiles, many=True)
+        return Response(serializer.data)
 
 
 class DeleteProfileView(APIView):
@@ -94,9 +115,3 @@ class DeleteProfileView(APIView):
                 {"message": "Error deleting user"},
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR,
             )
-
-class AdminUserProfileView(APIView):
-  def get(self, request):
-    user_profiles = CustomUser.objects.all()
-    serializer = UserProfileSerializer(user_profiles, many=True)
-    return Response(serializer.data)

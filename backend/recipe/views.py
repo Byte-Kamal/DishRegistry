@@ -1,27 +1,18 @@
-# pylint: disable=missing-docstring
-
 from django.shortcuts import get_object_or_404
 from rest_framework import status
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from django.db.models import Q
 
 from .models import Recipe, Review
 from .serializers import RecipeSerializer, ReviewSerializer
 
 
-class RecipeListView(APIView):
-    def get(self, request):
-        search_term = request.query_params.get('search', None)
-        recipes = Recipe.objects.all()
+class RecipeListCreateView(APIView):
+    permission_classes = [IsAuthenticated]
 
-        # If a search term is provided, filter the recipes
-        if search_term:
-            recipes = recipes.filter(
-                Q(title__icontains=search_term) |
-                Q(ingredients__icontains=search_term)
-            )
-        
+    def get(self, request):
+        recipes = Recipe.objects.all()
         serializer = RecipeSerializer(recipes, many=True)
         return Response(serializer.data)
 
@@ -34,13 +25,18 @@ class RecipeListView(APIView):
 
 
 class RecipeDetailView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get_object(self, pk):
+        return get_object_or_404(Recipe, pk=pk)
+
     def get(self, request, pk):
-        recipe = get_object_or_404(Recipe, pk=pk)
+        recipe = self.get_object(pk)
         serializer = RecipeSerializer(recipe)
         return Response(serializer.data)
 
     def put(self, request, pk):
-        recipe = get_object_or_404(Recipe, pk=pk, created_by=request.user)
+        recipe = self.get_object(pk)
         serializer = RecipeSerializer(recipe, data=request.data, partial=True)
         if serializer.is_valid():
             serializer.save()
@@ -48,12 +44,14 @@ class RecipeDetailView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def delete(self, request, pk):
-        recipe = get_object_or_404(Recipe, pk=pk, created_by=request.user)
+        recipe = self.get_object(pk)
         recipe.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
-class ReviewCreateView(APIView):
+class ReviewListCreateView(APIView):
+    permission_classes = [IsAuthenticated]
+
     def post(self, request, recipe_pk):
         recipe = get_object_or_404(Recipe, pk=recipe_pk)
         serializer = ReviewSerializer(data=request.data)
@@ -62,15 +60,16 @@ class ReviewCreateView(APIView):
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-
-class ReviewListView(APIView):
-    def get(self, request, recipe_pk=None):
-        if recipe_pk:
-            reviews = Review.objects.filter(recipe__id=recipe_pk)
-        else:
-            reviews = Review.objects.all()
-        
+    def get(self, request, recipe_pk):
+        reviews = Review.objects.filter(recipe__pk=recipe_pk)
         serializer = ReviewSerializer(reviews, many=True)
         return Response(serializer.data)
 
-    
+
+class AllReviewsListView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        reviews = Review.objects.all()
+        serializer = ReviewSerializer(reviews, many=True)
+        return Response(serializer.data)

@@ -22,5 +22,7 @@ from django.urls import include, path
 
 urlpatterns = [
     path("admin/", admin.site.urls),
-    path("api/", include("dishregistry.api_urls"), name="API"),
+    path("api-auth/", include("user.urls")),
+    path("api/", include("recipe.urls")),
+    path("api/", include("mealplan.urls")),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

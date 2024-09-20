@@ -1,6 +1,5 @@
 # pylint: disable=missing-docstring, abstract-method
 
-from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Group
 from django.core.exceptions import ObjectDoesNotExist
 from rest_framework import serializers
@@ -26,13 +25,16 @@ class RegisterSerializer(serializers.ModelSerializer):
         role = validated_data["role"]
 
         # Create the user
-        user = CustomUser.objects.create_user(email=email, name=name, password=password, role=role)
+        user = CustomUser.objects.create_user(
+            email=email, name=name, password=password, role=role
+        )
 
         # Assign the user to the specified group
         try:
             group = Group.objects.get(name=role)
             user.groups.add(group)
         except ObjectDoesNotExist:
+            user.delete()
             raise ValidationError(f"Group '{role}' does not exist.")
 
         refresh = RefreshToken.for_user(user)
@@ -48,8 +50,6 @@ class RegisterSerializer(serializers.ModelSerializer):
 
 
 class UserProfileSerializer(serializers.ModelSerializer):
-    profile_picture = serializers.SerializerMethodField()
-
     class Meta:
         model = CustomUser
         fields = [
@@ -57,20 +57,18 @@ class UserProfileSerializer(serializers.ModelSerializer):
             "name",
             "email",
             "role",
-            "profile_picture",
             "bio",
+            "profile_picture",
+            "contact_number",
+            "address",
+            "date_joined",
         ]
-
-    def get_profile_picture(self, obj):
-        if obj.profile_picture:
-            return obj.profile_picture.url
-        return None
 
 
 class UserProfileUpdateSerializer(serializers.ModelSerializer):
     class Meta:
         model = CustomUser
-        fields = ["profile_picture", "bio"]
+        fields = ["bio", "profile_picture", "contact_number", "address"]
 
 
 class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):

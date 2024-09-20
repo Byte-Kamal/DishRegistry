@@ -1,43 +1,48 @@
-# pylint: disable=missing-docstring
-
-from django.shortcuts import get_object_or_404
-from rest_framework import status
+from rest_framework import permissions, viewsets
+from rest_framework.decorators import action
 from rest_framework.response import Response
-from rest_framework.views import APIView
 
 from .models import MealPlan
 from .serializers import MealPlanSerializer
 
 
-class MealPlanListView(APIView):
-    def get(self, request):
-        meal_plans = MealPlan.objects.filter(user=request.user)
-        serializer = MealPlanSerializer(meal_plans, many=True)
-        return Response(serializer.data)
+class MealPlanViewSet(viewsets.ModelViewSet):
+    queryset = MealPlan.objects.all()
+    serializer_class = MealPlanSerializer
+    permission_classes = [permissions.IsAuthenticated]
 
-    def post(self, request):
-        serializer = MealPlanSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save(user=request.user)
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    def get_queryset(self):
+        return MealPlan.objects.filter(user=self.request.user)
 
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
 
-class MealPlanDetailView(APIView):
-    def get(self, request, pk):
-        meal_plan = get_object_or_404(MealPlan, pk=pk, user=request.user)
-        serializer = MealPlanSerializer(meal_plan)
-        return Response(serializer.data)
+    @action(detail=False, methods=["post"], url_path="generate-shopping-list")
+    def generate_shopping_list(self, request):
+        day = request.data.get("meal_plan_day")
+        meal_plan = MealPlan.objects.filter(user=request.user, day=day).first()
 
-    def put(self, request, pk):
-        meal_plan = get_object_or_404(MealPlan, pk=pk, user=request.user)
-        serializer = MealPlanSerializer(meal_plan, data=request.data, partial=True)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        if not meal_plan:
+            return Response({"error": "Meal plan not found for the day"}, status=404)
 
-    def delete(self, request, pk):
-        meal_plan = get_object_or_404(MealPlan, pk=pk, user=request.user)
-        meal_plan.delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
+        ingredients = []
+        for recipe in meal_plan.recipes.all():
+            for ingredient in recipe.ingredients.all():
+                ingredient_str = (
+                    f"{ingredient.quantity} {ingredient.unit} of {ingredient.name}"
+                )
+                ingredients.append(ingredient_str)
+
+        # Remove duplicate ingredients
+        unique_ingredients = list(set(ingredients))
+
+        # Update the shopping_list field in MealPlan
+        meal_plan.shopping_list = ", ".join(unique_ingredients)
+        meal_plan.save()
+
+        return Response(
+            {
+                "day": day,
+                "ingredients": unique_ingredients,
+            }
+        )
