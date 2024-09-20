@@ -8,7 +8,7 @@ from .models import Recipe, Review
 class ReviewSerializer(serializers.ModelSerializer):
     class Meta:
         model = Review
-        fields = ["id", "user", "rating", "review_text", "created_at"]
+        fields = ["id", "user", "recipe", "rating", "review_text", "created_at"]
 
 
 class RecipeSerializer(serializers.ModelSerializer):
@@ -23,6 +23,9 @@ class RecipeSerializer(serializers.ModelSerializer):
             "instructions",
             "category",
             "tags",
+            "cooking_time",
+            "servings",
+            "prep_time",
             "created_by",
             "created_at",
             "updated_at",

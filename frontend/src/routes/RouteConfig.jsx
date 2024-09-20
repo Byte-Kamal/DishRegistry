@@ -8,7 +8,9 @@ import Login from "../pages/Login";
 import PlannerDashboard from "../pages/PlannerDashboard";
 import Recipes from "../pages/Recipes";
 import Register from "../pages/Register";
-import Search from "../pages/Search";
+// import Search from "../pages/Search";
+import RecipeDetails from "../pages/RecipeDetails";
+import RecipeSearch from "../pages/RecipeSearch";
 import UserDashboard from "../pages/UserDashboard";
 
 const RouteConfig = () => {
@@ -20,7 +22,9 @@ const RouteConfig = () => {
           <Route path="/register" element={<Register />} />
           <Route path="/login" element={<Login />} />
           <Route path="/recipes" element={<Recipes />} />
-          <Route path="/search" element={<Search />} />
+          {/* <Route path="/search" element={<Search />} /> */}
+          <Route path="/recipe-details/:id" element={<RecipeDetails />} />
+          <Route path="/search" element={<RecipeSearch />} />
           <Route path="/admin-dashboard" element={<AdminDashboard />} />
           <Route path="/cook-dashboard" element={<CookDashboard />} />
           <Route path="/planner-dashboard" element={<PlannerDashboard />} />

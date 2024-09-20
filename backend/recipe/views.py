@@ -4,6 +4,7 @@ from django.shortcuts import get_object_or_404
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from django.db.models import Q
 
 from .models import Recipe, Review
 from .serializers import RecipeSerializer, ReviewSerializer
@@ -11,7 +12,16 @@ from .serializers import RecipeSerializer, ReviewSerializer
 
 class RecipeListView(APIView):
     def get(self, request):
+        search_term = request.query_params.get('search', None)
         recipes = Recipe.objects.all()
+
+        # If a search term is provided, filter the recipes
+        if search_term:
+            recipes = recipes.filter(
+                Q(title__icontains=search_term) |
+                Q(ingredients__icontains=search_term)
+            )
+        
         serializer = RecipeSerializer(recipes, many=True)
         return Response(serializer.data)
 
@@ -54,7 +64,13 @@ class ReviewCreateView(APIView):
 
 
 class ReviewListView(APIView):
-    def get(self, request, recipe_pk):
-        reviews = Review.objects.filter(recipe__id=recipe_pk)
+    def get(self, request, recipe_pk=None):
+        if recipe_pk:
+            reviews = Review.objects.filter(recipe__id=recipe_pk)
+        else:
+            reviews = Review.objects.all()
+        
         serializer = ReviewSerializer(reviews, many=True)
         return Response(serializer.data)
+
+    
