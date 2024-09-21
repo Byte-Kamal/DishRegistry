@@ -1,5 +1,5 @@
 import React, { useContext } from "react";
-import { ReviewContext } from "../../contexts/ReviewContext";
+import { ReviewContext } from "../contexts/ReviewContext";
 const RecipeLikesComments = () => {
 
   const {reviews, loadingReviews} = useContext(ReviewContext);

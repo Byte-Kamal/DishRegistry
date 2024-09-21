@@ -1,8 +1,11 @@
 from rest_framework import status
-from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly
+from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly, IsAdminUser
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from django.contrib.auth.decorators import login_required
 from rest_framework_simplejwt.views import TokenObtainPairView
+from django.shortcuts import get_object_or_404
+from rest_framework.permissions import AllowAny
 
 from .models import CustomUser
 from .serializers import (
@@ -14,6 +17,7 @@ from .serializers import (
 
 
 class RegisterView(APIView):
+    permission_classes = [AllowAny]
     def post(self, request):
         serializer = RegisterSerializer(data=request.data)
         if serializer.is_valid():
@@ -69,49 +73,48 @@ class UserProfileView(APIView):
             user = request.user
             serializer = UserProfileSerializer(user)
             return Response(serializer.data)
-        else:
-            return Response(
-                {"detail": "Authentication credentials were not provided."},
-                status=status.HTTP_401_UNAUTHORIZED,
-            )
+        return Response(
+            {"detail": "Authentication credentials were not provided."},
+            status=status.HTTP_401_UNAUTHORIZED,
+        )
 
     def patch(self, request):
         if request.user.is_authenticated:
             user = request.user
-            serializer = UserProfileUpdateSerializer(
-                user, data=request.data, partial=True
-            )
+            serializer = UserProfileUpdateSerializer(user, data=request.data, partial=True)
             if serializer.is_valid():
                 serializer.save()
                 return Response(serializer.data)
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-        else:
-            return Response(
-                {"detail": "Authentication credentials were not provided."},
-                status=status.HTTP_401_UNAUTHORIZED,
-            )
+        return Response(
+            {"detail": "Authentication credentials were not provided."},
+            status=status.HTTP_401_UNAUTHORIZED,
+        )
+
 
 
 class AdminUserProfileView(APIView):
-    def get(self, request):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, profile_id=None):
+        if profile_id:
+            user_profile = get_object_or_404(CustomUser, id=profile_id)
+            serializer = UserProfileSerializer(user_profile)
+            return Response(serializer.data)
         user_profiles = CustomUser.objects.all()
         serializer = UserProfileSerializer(user_profiles, many=True)
         return Response(serializer.data)
 
 
-class DeleteProfileView(APIView):
-    permission_classes = [IsAuthenticated]
+class UserProfileDetail(APIView):
+    permission_classes = [IsAuthenticated, IsAdminUser]
 
-    def delete(self, request):
-        user = request.user
-        try:
-            user.delete()
-            return Response(
-                {"message": "User deleted successfully"},
-                status=status.HTTP_204_NO_CONTENT,
-            )
-        except Exception:
-            return Response(
-                {"message": "Error deleting user"},
-                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            )
+    def get(self, request, pk):
+        user = get_object_or_404(CustomUser, pk=pk)
+        serializer = UserProfileSerializer(user)
+        return Response(serializer.data)
+
+    def delete(self, request, pk):
+        user = get_object_or_404(CustomUser, pk=pk)
+        user.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)

@@ -1,7 +1,9 @@
+// TODO: Need to fix the styling of the PlannerDashboard page
+// TODO: Need to fix the functionality of the meal plan creation and editing
+
 import React, { useState } from "react";
 import CreateEditMealPlan from "../components/PlannerDashboard/CreateEditMealPlan";
 import MyMealsPlan from "../components/PlannerDashboard/MyMealsPlan";
-import RecommendRecipe from "../components/PlannerDashboard/RecommendRecipe";
 import SavedRecipe from "../components/PlannerDashboard/SavedRecipe";
 import ShoppingList from "../components/PlannerDashboard/ShoppingList";
 
@@ -19,8 +21,6 @@ const PlannerDashboard = () => {
             setMealPlanToEdit={setMealPlanToEdit}
           />
         );
-      case "RecommendRecipe":
-        return <RecommendRecipe />;
       case "ShoppingList":
         return <ShoppingList />;
       case "SavedRecipe":
@@ -54,12 +54,6 @@ const PlannerDashboard = () => {
               onClick={() => setActiveSection("MyMealsPlan")}
             >
               My Meals Plan
-            </li>
-            <li
-              className="mb-2 cursor-pointer"
-              onClick={() => setActiveSection("RecommendRecipe")}
-            >
-              Recommend Recipe
             </li>
             <li
               className="mb-2 cursor-pointer"

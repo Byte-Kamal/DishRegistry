@@ -1,27 +1,24 @@
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 
 const SubmitNewRecipe = () => {
-  const [title, setTitle] = useState("");
-  const [description, setDescription] = useState("");
-  const [category, setCategory] = useState("Appetizer");
-  const [cookingTime, setCookingTime] = useState("");
-  const [serving, setServing] = useState("");
-  const [prepTime, setPrepTime] = useState("");
-  const [ingredients, setIngredients] = useState([
-    { name: "", quantity: "", unit: "" },
-  ]);
-  const [instructions, setInstructions] = useState([
-    { step_number: 1, instruction_text: "" },
-  ]);
-  const [image, setImage] = useState(null);
+  const titleRef = useRef();
+  const descriptionRef = useRef();
+  const categoryRef = useRef();
+  const cookingTimeRef = useRef();
+  const servingRef = useRef();
+  const prepTimeRef = useRef();
+  const imageRef = useRef();
+  const tagsRef = useRef();
+  const [ingredients, setIngredients] = useState([{ name: "", quantity: "", unit: "" }]);
+  const [instructions, setInstructions] = useState([{ step_number: 1, instruction_text: "" }]);
 
-  const addIngredient = () =>
+  const addIngredient = () => {
     setIngredients([...ingredients, { name: "", quantity: "", unit: "" }]);
-  const addInstruction = () =>
-    setInstructions([
-      ...instructions,
-      { step_number: instructions.length + 1, instruction_text: "" },
-    ]);
+  };
+
+  const addInstruction = () => {
+    setInstructions([...instructions, { step_number: instructions.length + 1, instruction_text: "" }]);
+  };
 
   const handleIngredientChange = (index, field, value) => {
     const newIngredients = [...ingredients];
@@ -29,63 +26,72 @@ const SubmitNewRecipe = () => {
     setIngredients(newIngredients);
   };
 
-  const handleInstructionChange = (index, value) => {
+  const handleInstructionChange = (index, field, value) => {
     const newInstructions = [...instructions];
-    newInstructions[index].instruction_text = value;
+    newInstructions[index][field] = value;
     setInstructions(newInstructions);
   };
 
   const handleRemoveIngredient = (index) => {
     const newIngredients = ingredients.filter((_, i) => i !== index);
-    setIngredients(
-      newIngredients.length
-        ? newIngredients
-        : [{ name: "", quantity: "", unit: "" }]
-    );
+    setIngredients(newIngredients);
   };
 
   const handleRemoveInstruction = (index) => {
     const newInstructions = instructions.filter((_, i) => i !== index);
-    setInstructions(
-      newInstructions.length
-        ? newInstructions
-        : [{ step_number: 1, instruction_text: "" }]
-    );
-  };
-
-  const handleImageChange = (e) => {
-    setImage(e.target.files[0]);
+    setInstructions(newInstructions.map((instruction, i) => ({ ...instruction, step_number: i + 1 })));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const formData = new FormData();
-    formData.append("title", title);
-    formData.append("description", description);
-    formData.append("prep_time", prepTime);
-    formData.append("cooking_time", cookingTime);
-    formData.append("serving_people", serving);
-    formData.append("ingredients", JSON.stringify(ingredients));
-    formData.append("instructions", JSON.stringify(instructions));
-    if (image) {
-      formData.append("image", image);
-    }
-
+  
+    const recipeData = {
+      title: titleRef.current.value,
+      description: descriptionRef.current.value,
+      category: categoryRef.current.value,
+      cooking_time: cookingTimeRef.current.value,
+      servings: servingRef.current.value,
+      prep_time: prepTimeRef.current.value,
+      tags: tagsRef.current.value,
+      ingredients: ingredients,
+      instructions: instructions,
+    };
+    console.log("Recipe Data:", recipeData);
     try {
-      const response = await fetch("http://localhost:8000/api/recipe/", {
+      const token = localStorage.getItem("accessToken");
+      const response = await fetch("http://localhost:8000/api/recipes/", {
         method: "POST",
-        body: formData,
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(recipeData),
       });
+  
       if (response.ok) {
         alert("Recipe submitted successfully!");
+        titleRef.current.value = "";
+        descriptionRef.current.value = "";
+        categoryRef.current.value = "Appetizer";
+        cookingTimeRef.current.value = "";
+        servingRef.current.value = "";
+        prepTimeRef.current.value = "";
+        tagsRef.current.value = "";
+        setIngredients([{ name: "", quantity: "", unit: "" }]);
+        setInstructions([{ step_number: 1, instruction_text: "" }]);
+
       } else {
-        alert("Failed to submit recipe.");
+        console.log("Recipe Data:", recipeData);
+        const errorData = await response.json();
+        console.error("Failed to submit recipe:", errorData);
+        alert(`Failed to submit recipe: ${JSON.stringify(errorData)}`);
       }
     } catch (error) {
       console.error("Error submitting recipe:", error);
       alert("Error submitting recipe.");
     }
   };
+  
 
   return (
     <div>
@@ -95,16 +101,14 @@ const SubmitNewRecipe = () => {
           <label className="block text-gray-300">Recipe Title</label>
           <input
             type="text"
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
+            ref={titleRef}
             className="w-full p-2 bg-gray-700 text-white"
           />
         </div>
         <div className="mb-4">
           <label className="block text-gray-300">Description</label>
           <textarea
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
+            ref={descriptionRef}
             className="w-full p-2 bg-gray-700 text-white"
           ></textarea>
         </div>
@@ -112,12 +116,12 @@ const SubmitNewRecipe = () => {
           <label className="block text-gray-300">Image</label>
           <input
             type="file"
-            onChange={handleImageChange}
+            ref={imageRef}
             className="w-full p-2 bg-gray-700 text-white"
           />
-          {image && (
+          {imageRef.current && imageRef.current.files[0] && (
             <img
-              src={URL.createObjectURL(image)}
+              src={URL.createObjectURL(imageRef.current.files[0])}
               alt="Recipe"
               className="mt-4"
               style={{ width: "200px", height: "200px" }}
@@ -127,21 +131,22 @@ const SubmitNewRecipe = () => {
         <div className="mb-4">
           <label className="block text-gray-300">Category</label>
           <select
-            value={category}
-            onChange={(e) => setCategory(e.target.value)}
+            ref={categoryRef}
             className="w-full p-2 bg-gray-700 text-white"
           >
             <option>Appetizer</option>
             <option>Main Course</option>
             <option>Dessert</option>
+            <option>Drinks</option>
+            <option>Snacks</option>
+            <option>Salad</option>
           </select>
         </div>
         <div className="mb-4">
           <label className="block text-gray-300">Cooking Time (minutes)</label>
           <input
             type="number"
-            value={cookingTime}
-            onChange={(e) => setCookingTime(e.target.value)}
+            ref={cookingTimeRef}
             className="w-full p-2 bg-gray-700 text-white"
           />
         </div>
@@ -151,8 +156,7 @@ const SubmitNewRecipe = () => {
           </label>
           <input
             type="number"
-            value={serving}
-            onChange={(e) => setServing(e.target.value)}
+            ref={servingRef}
             className="w-full p-2 bg-gray-700 text-white"
           />
         </div>
@@ -162,8 +166,15 @@ const SubmitNewRecipe = () => {
           </label>
           <input
             type="number"
-            value={prepTime}
-            onChange={(e) => setPrepTime(e.target.value)}
+            ref={prepTimeRef}
+            className="w-full p-2 bg-gray-700 text-white"
+          />
+        </div>
+        <div className="mb-4">
+          <label className="block text-gray-300">Tags</label>
+          <input
+            type="text"
+            ref={tagsRef}
             className="w-full p-2 bg-gray-700 text-white"
           />
         </div>
@@ -222,9 +233,16 @@ const SubmitNewRecipe = () => {
           {instructions.map((instruction, index) => (
             <div key={index} className="flex mb-2">
               <input
+                type="number"
+                value={instruction.step_number}
+                onChange={(e) => handleInstructionChange(index, "step_number", e.target.value)}
+                placeholder="Step Number"
+                className="w-1/4 p-2 bg-gray-700 text-white mr-2"
+              />
+              <input
                 type="text"
                 value={instruction.instruction_text}
-                onChange={(e) => handleInstructionChange(index, e.target.value)}
+                onChange={(e) => handleInstructionChange(index, "instruction_text", e.target.value)}
                 placeholder="Instruction"
                 className="w-full p-2 bg-gray-700 text-white mr-2"
               />

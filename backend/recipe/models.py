@@ -10,7 +10,7 @@ class Recipe(models.Model):
     servings = models.PositiveIntegerField()
     prep_time = models.PositiveIntegerField()  # in minutes
     tags = models.CharField(max_length=255, blank=True, null=True)
-    image = models.ImageField(upload_to="recipes/", blank=True, null=True)
+    image = models.URLField(blank=True, null=True)
     created_by = models.ForeignKey(
         settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="recipes"
     )

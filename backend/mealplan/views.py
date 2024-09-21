@@ -1,29 +1,66 @@
-from rest_framework import permissions, viewsets
-from rest_framework.decorators import action
+from rest_framework import permissions, status
 from rest_framework.response import Response
+from rest_framework.views import APIView
 
 from .models import MealPlan
 from .serializers import MealPlanSerializer
 
 
-class MealPlanViewSet(viewsets.ModelViewSet):
-    queryset = MealPlan.objects.all()
-    serializer_class = MealPlanSerializer
+class MealPlanAPIView(APIView):
     permission_classes = [permissions.IsAuthenticated]
 
-    def get_queryset(self):
-        return MealPlan.objects.filter(user=self.request.user)
+    def get(self, request):
+        meal_plans = MealPlan.objects.filter(user=request.user)
+        serializer = MealPlanSerializer(meal_plans, many=True)
+        return Response(serializer.data)
 
-    def perform_create(self, serializer):
-        serializer.save(user=self.request.user)
+    def post(self, request):
+        serializer = MealPlanSerializer(data=request.data)
+        if serializer.is_valid():
+            meal_plan = serializer.save(user=request.user)
+            return Response(
+                MealPlanSerializer(meal_plan).data, status=status.HTTP_201_CREATED
+            )
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    @action(detail=False, methods=["post"], url_path="generate-shopping-list")
-    def generate_shopping_list(self, request):
+    def put(self, request, pk):
+        try:
+            meal_plan = MealPlan.objects.get(pk=pk, user=request.user)
+        except MealPlan.DoesNotExist:
+            return Response(
+                {"error": "Meal plan not found"}, status=status.HTTP_404_NOT_FOUND
+            )
+
+        serializer = MealPlanSerializer(meal_plan, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def delete(self, request, pk):
+        try:
+            meal_plan = MealPlan.objects.get(pk=pk, user=request.user)
+        except MealPlan.DoesNotExist:
+            return Response(
+                {"error": "Meal plan not found"}, status=status.HTTP_404_NOT_FOUND
+            )
+
+        meal_plan.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class GenerateShoppingListAPIView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def post(self, request):
         day = request.data.get("meal_plan_day")
         meal_plan = MealPlan.objects.filter(user=request.user, day=day).first()
 
         if not meal_plan:
-            return Response({"error": "Meal plan not found for the day"}, status=404)
+            return Response(
+                {"error": "Meal plan not found for the day"},
+                status=status.HTTP_404_NOT_FOUND,
+            )
 
         ingredients = []
         for recipe in meal_plan.recipes.all():

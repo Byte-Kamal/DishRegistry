@@ -1,7 +1,7 @@
 import React, { useState } from "react";
-import RateAndReview from "../components/UserDashboard/RateAndReview";
-import SavedMealPlan from "../components/UserDashboard/SavedMealPlan";
-import SavedRecipes from "../components/UserDashboard/SavedRecipes";
+import RateAndReview from "./UserDashboard/RateAndReview";
+import SavedMealPlan from "./UserDashboard/SavedMealPlan";
+import SavedRecipes from "./UserDashboard/SavedRecipes";
 
 
 const UserDashboard = () => {

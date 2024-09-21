@@ -38,9 +38,7 @@ class CustomUser(AbstractUser):
     role = models.CharField(max_length=20, choices=ROLE_CHOICES, default="Users")
 
     bio = models.TextField(null=True, blank=True)
-    profile_picture = models.ImageField(
-        upload_to="profile_pictures/", null=True, blank=True
-    )
+    profile_picture = models.URLField(null=True, blank=True)
     contact_number = models.CharField(max_length=15, null=True, blank=True)
     address = models.TextField(null=True, blank=True)
     date_joined = models.DateField(auto_now_add=True)

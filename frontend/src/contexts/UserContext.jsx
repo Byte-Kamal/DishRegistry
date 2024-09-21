@@ -10,8 +10,15 @@ export const UserProvider = ({ children }) => {
   useEffect(() => {
     const fetchUsers = async () => {
       try {
-        const response = await axios.get("http://localhost:8000/api/admin/profiles/", {
-          withCredentials: true
+        const token = localStorage.getItem('accessToken')
+        if (token !== "Admin") {
+          return;
+        }
+        const response = await axios.get("http://localhost:8000/api-auth/admin/profiles/", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+          withCredentials: true,
         });
         console.log("Users fetched:", response.data);
         setUsers(response.data);

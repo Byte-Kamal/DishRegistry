@@ -1,5 +1,6 @@
 import axios from "axios";
 import React, { useEffect, useState } from "react";
+import RecipeCardDetailed from "../components/RecipeCards/RecipeCardDetailed";
 
 const RecipeSearch = () => {
   const [recipes, setRecipes] = useState([]);
@@ -41,20 +42,7 @@ const RecipeSearch = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {recipes.length > 0 ? (
             recipes.map((recipe) => (
-              <div
-                key={recipe.id}
-                className="bg-white p-4 rounded-lg shadow hover:shadow-lg transition"
-              >
-                <h2 className="text-xl font-semibold mb-2">{recipe.title}</h2>
-                <p className="text-gray-600">
-                  {recipe.ingredients.length > 100
-                    ? `${recipe.ingredients.substring(0, 100)}...`
-                    : recipe.ingredients}
-                </p>
-                <button className="mt-4 text-blue-500 hover:text-blue-600">
-                  View Recipe
-                </button>
-              </div>
+              <RecipeCardDetailed key={recipe.id} recipe={recipe} />
             ))
           ) : (
             <p className="text-gray-600 text-center col-span-3">

@@ -66,14 +66,14 @@ const Navbar = () => {
                 Dashboard
               </Link>
             )}
-            {userGroup === "Users" && (
+            {/* {userGroup === "Users" && (
               <Link
                 to="/user-dashboard"
                 className="text-white text-lg font-medium px-3 py-2 rounded-md transition-transform transform hover:scale-105 hover:bg-gray-700"
               >
                 Dashboard
               </Link>
-            )}
+            )} */}
             {userGroup === "Cooks" && (
               <Link
                 to="/cook-dashboard"

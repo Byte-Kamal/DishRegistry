@@ -1,5 +1,7 @@
+// TODO: Fetching user created recipes and displaying them in a table.
+
 import React, { useContext } from "react";
-import { RecipeContext } from "../../contexts/RecipeContext";
+import { RecipeContext } from "../contexts/RecipeContext";
 
 
 const MyRecipes = () => {

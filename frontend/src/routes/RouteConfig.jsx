@@ -5,15 +5,17 @@ import AdminDashboard from "../pages/AdminDashboard";
 import CookDashboard from "../pages/CookDashboard";
 import Home from "../pages/Home";
 import Login from "../pages/Login";
-import PlannerDashboard from "../pages/PlannerDashboard";
-import Recipes from "../pages/Recipes";
-import Register from "../pages/Register";
-// import Search from "../pages/Search";
+import MealPlannerDashboard from "../pages/MealPlannerDashboard";
+import NotFound from "../pages/NotFound";
+import Profile from "../pages/Profile";
+import ProfileEdit from "../pages/ProfileEdit";
 import RecipeDetails from "../pages/RecipeDetails";
+import Recipes from "../pages/Recipes";
 import RecipeSearch from "../pages/RecipeSearch";
-import UserDashboard from "../pages/UserDashboard";
+import Register from "../pages/Register";
 
 const RouteConfig = () => {
+
   return (
       <Router>
         <Navbar />
@@ -22,13 +24,14 @@ const RouteConfig = () => {
           <Route path="/register" element={<Register />} />
           <Route path="/login" element={<Login />} />
           <Route path="/recipes" element={<Recipes />} />
-          {/* <Route path="/search" element={<Search />} /> */}
           <Route path="/recipe-details/:id" element={<RecipeDetails />} />
           <Route path="/search" element={<RecipeSearch />} />
           <Route path="/admin-dashboard" element={<AdminDashboard />} />
           <Route path="/cook-dashboard" element={<CookDashboard />} />
-          <Route path="/planner-dashboard" element={<PlannerDashboard />} />
-          <Route path="/user-dashboard" element={<UserDashboard />} />
+          <Route path="/planner-dashboard" element={<MealPlannerDashboard />} />
+          <Route path="*" element={<NotFound />} />
+          <Route path="/profile" element={<Profile />} />
+          <Route path="/profile/edit" element={<ProfileEdit />} />
         </Routes>
         <Footer />
       </Router>

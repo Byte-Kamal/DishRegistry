@@ -7,11 +7,11 @@ import { RecipeContext } from "../contexts/RecipeContext";
 import { ReviewContext } from "../contexts/ReviewContext";
 import { UserContext } from "../contexts/UserContext";
 
-
 const AdminDashboard = () => {
   const { recipes, loadingRecipe } = useContext(RecipeContext);
   const { reviews, loadingReview } = useContext(ReviewContext);
   const { users, loadingUser } = useContext(UserContext);
+  const accessToken = localStorage.getItem("accessToken");
 
   const [activeSection, setActiveSection] = useState("Dashboard");
 
@@ -19,15 +19,14 @@ const AdminDashboard = () => {
   if (loadingReview) return <p>Loading reviews...</p>;
   if (loadingUser) return <p>Loading users...</p>;
 
-
   const renderSection = () => {
     switch (activeSection) {
       case "UserManagement":
-        return <UserManagement users={users}/>;
+        return <UserManagement users={users} accessToken={accessToken} />;
       case "RecipeManagement":
-        return <RecipeManagement recipes={recipes}/>;
+        return <RecipeManagement recipes={recipes} accessToken={accessToken} />;
       case "RecipeReviews":
-        return <RecipeReviews reviews={reviews}/>;
+        return <RecipeReviews reviews={reviews} />;
       case "Dashboard":
         return <Dashboard setActiveSection={setActiveSection} />;
       default:

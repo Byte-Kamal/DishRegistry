@@ -18,7 +18,7 @@ const Login = () => {
     try {
       // Send login request
       const response = await axios.post(
-        "http://localhost:8000/api/auth/login/",
+        "http://localhost:8000/api-auth/login/",
         JSON.stringify(formData),
         {
           headers: {
@@ -30,12 +30,9 @@ const Login = () => {
     
       // Extract access and refresh tokens from the response
       const { access, refresh } = response.data;
-      console.log("Access token:", access);
-      console.log("Refresh token:", refresh);
-    
       // Fetch profile data
       const profileResponse = await axios.get(
-        "http://localhost:8000/api/profile/",
+        "http://localhost:8000/api-auth/profile/",
         {
           headers: {
             Authorization: `Bearer ${access}`,

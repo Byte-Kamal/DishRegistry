@@ -2,24 +2,10 @@
 
 from django.urls import path
 
-from .views import MealPlanViewSet
+from .views import MealPlanAPIView, GenerateShoppingListAPIView
 
 urlpatterns = [
-    path(
-        "mealplans/",
-        MealPlanViewSet.as_view({"get": "list", "post": "create"}),
-        name="mealplan-list",
-    ),
-    path(
-        "mealplans/<int:pk>/",
-        MealPlanViewSet.as_view(
-            {"get": "retrieve", "put": "update", "delete": "destroy"}
-        ),
-        name="mealplan-detail",
-    ),
-    path(
-        "mealplans/generate-shopping-list/",
-        MealPlanViewSet.as_view({"post": "generate_shopping_list"}),
-        name="generate-shopping-list",
-    ),
+       path('mealplans/', MealPlanAPIView.as_view(), name='mealplan-list-create'),
+    path('mealplans/<int:pk>/', MealPlanAPIView.as_view(), name='mealplan-detail'),
+    path('mealplans/generate-shopping-list/', GenerateShoppingListAPIView.as_view(), name='generate-shopping-list'),
 ]

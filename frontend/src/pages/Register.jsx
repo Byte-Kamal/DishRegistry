@@ -22,7 +22,7 @@ const Register = () => {
     try {
       // Send registration request
       const response = await axios.post(
-        "http://localhost:8000/api/auth/register/",
+        "http://localhost:8000/api-auth/register/",
         formData,
         {
           headers: {

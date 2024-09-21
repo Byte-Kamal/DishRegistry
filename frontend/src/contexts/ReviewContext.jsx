@@ -1,5 +1,5 @@
-import axios from "axios";
-import React, { createContext, useEffect, useState } from "react";
+import axios from 'axios';
+import React, { createContext, useEffect, useState } from 'react';
 
 export const ReviewContext = createContext();
 
@@ -7,20 +7,43 @@ export const ReviewProvider = ({ children }) => {
   const [reviews, setReviews] = useState([]);
   const [loading, setLoading] = useState(true);
 
+
   useEffect(() => {
     const fetchReviews = async () => {
       try {
-        const response = await axios.get("http://localhost:8000/api/reviews/");
+        const token = localStorage.getItem('accessToken');
+
+        if (!token ) {
+          setLoading(false);
+          return;
+        } else if (token !== "Admin") {
+          setLoading(false);
+          return;
+        }
+        
+        const response = await axios.get("http://localhost:8000/api/reviews/", {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+        
         console.log("Reviews fetched:", response.data);
         setReviews(response.data);
       } catch (error) {
-        console.error("Error fetching reviews:", error);
+        if (error.response && error.response.status === 401) {
+          console.error("Unauthorized: Redirecting to login...");
+          // Handle redirect to login or show a message
+        } else {
+          console.error("Error fetching reviews:", error);
+        }
       } finally {
         setLoading(false);
       }
     };
 
-    fetchReviews();
+   
+      fetchReviews();
+  
   }, []);
 
   return (
@@ -28,4 +51,4 @@ export const ReviewProvider = ({ children }) => {
       {children}
     </ReviewContext.Provider>
   );
-}
+};
