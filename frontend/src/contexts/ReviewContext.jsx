@@ -12,11 +12,11 @@ export const ReviewProvider = ({ children }) => {
     const fetchReviews = async () => {
       try {
         const token = localStorage.getItem('accessToken');
-
+        const userGroup = localStorage.getItem('userGroup');
         if (!token ) {
           setLoading(false);
           return;
-        } else if (token !== "Admin") {
+        } else if (userGroup !== "Admin") {
           setLoading(false);
           return;
         }

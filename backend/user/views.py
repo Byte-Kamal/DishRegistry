@@ -1,11 +1,14 @@
+from django.shortcuts import get_object_or_404
 from rest_framework import status
-from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly, IsAdminUser
+from rest_framework.permissions import (
+    AllowAny,
+    IsAdminUser,
+    IsAuthenticated,
+    IsAuthenticatedOrReadOnly,
+)
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from django.contrib.auth.decorators import login_required
 from rest_framework_simplejwt.views import TokenObtainPairView
-from django.shortcuts import get_object_or_404
-from rest_framework.permissions import AllowAny
 
 from .models import CustomUser
 from .serializers import (
@@ -50,6 +53,8 @@ class RegisterView(APIView):
 
 # Custom TokenObtainPairView to handle login with email
 class CustomTokenObtainPairView(TokenObtainPairView):
+    permission_classes = [AllowAny]
+
     serializer_class = CustomTokenObtainPairSerializer
 
     def post(self, request, *args, **kwargs):

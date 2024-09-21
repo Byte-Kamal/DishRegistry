@@ -4,11 +4,10 @@ from rest_framework import permissions, status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
+
 from .models import Recipe, Review
 from .serializers import RecipeSerializer, ReviewSerializer
 
-
-from rest_framework import permissions
 
 class RecipeListCreateView(APIView):
     permission_classes = [permissions.AllowAny]  # Allow all users to access GET
@@ -79,7 +78,6 @@ class ReviewListCreateView(APIView):
         reviews = Review.objects.filter(recipe__pk=recipe_pk)
         serializer = ReviewSerializer(reviews, many=True)
         return Response(serializer.data)
-
 
 class AllReviewsListView(APIView):
     permission_classes = [IsAuthenticated]

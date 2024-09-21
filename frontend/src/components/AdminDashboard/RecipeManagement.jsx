@@ -24,7 +24,7 @@ const RecipeManagement = () => {
 
   const handleView = (e, id) => {
     e.preventDefault();
-    navigate(`/recipe-details/${id}`);
+    navigate(`/recipe/${id}`);
   };
 
   const handleDelete = async (e, id) => {

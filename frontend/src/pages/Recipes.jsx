@@ -1,43 +1,26 @@
-import axios from "axios";
-import { useEffect, useState } from "react";
-import RecipeCardHorizontal from "../components/RecipeCards/RecipeCardHorizontal";
+import React, { useContext } from 'react';
+import RecipeCardHorizontal from '../components/RecipeCards/RecipeCardHorizontal';
+import { RecipeContext } from '../contexts/RecipeContext';
 
 const Recipes = () => {
-  const [recipes, setRecipes] = useState([]);
+  const { recipes, loading } = useContext(RecipeContext);
 
-  useEffect(() => {
-    // Function to fetch recipes from the API
-    const fetchRecipes = async () => {
-      try {
-        // Make a GET request to the API endpoint
-        const response = await axios.get(`http://localhost:8000/api/recipes/`);
-        console.log(response.data);
-        // Update the state with the fetched recipes
-        setRecipes(response.data);
-      } catch (error) {
-        // Log any errors that occur during the fetch
-        console.error("Error fetching recipes:", error);
-      }
-    };
-  
-    // Call the fetchRecipes function when the component mounts
-    fetchRecipes();
-  }, []);
-  
+  if (loading) {
+    return <div className="container mx-auto p-4 bg-gray-900 text-white min-h-screen">Loading...</div>;
+  }
+
   return (
-    <div className="bg-gray-800 min-h-screen text-white">
-      <div className= "text-white text-center py-4">
-        <h1 className="text-3xl font-semibold">Recipes</h1>
-      </div>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-4">
-        {recipes.map((recipe) => (
-          <div key={recipe.id}>
+    <div className="container mx-auto p-4 bg-gray-900 text-white min-h-screen">
+      <h1 className="text-3xl font-bold mb-6 text-center">Recipes</h1>
+      <div className="flex flex-wrap -mx-2">
+        {recipes.map(recipe => (
+          <div key={recipe.id} className="w-full sm:w-1/2 p-2">
             <RecipeCardHorizontal recipe={recipe} />
           </div>
         ))}
       </div>
     </div>
   );
-}
+};
 
 export default Recipes;

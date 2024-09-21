@@ -1,122 +1,258 @@
-import axios from "axios";
-import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import axios from 'axios';
+import React, { useContext, useState } from 'react';
+import { useParams } from 'react-router-dom';
+import SmallReviewCard from '../components/ReviewCard/SmallReviewCard';
+import { RecipeContext } from '../contexts/RecipeContext';
+import Loading from './Loading';
 
-const RecipeDetail = () => {
+const RecipeDetails = () => {
   const { id } = useParams();
-  const [recipe, setRecipe] = useState(null);
-  const [imageUrl, setImageUrl] = useState("");
+  const { recipes, loading } = useContext(RecipeContext);
+  const [rating, setRating] = useState(0);
+  const [comment, setComment] = useState('');
+  const [title, setTitle] = useState('');
+  const [shareMessage, setShareMessage] = useState('');
 
-  useEffect(() => {
-    const baseURL = "http://localhost:8000/";
-    const fetchRecipe = async () => {
-      try {
-        const response = await axios.get(
-          `http://localhost:8000/api/recipes/${id}/`
-        );
-        setImageUrl(response.data.image ? `${baseURL}${response.data.image}` : "");
-        setRecipe(response.data);
-      } catch (error) {
-        console.error("Error fetching recipe details:", error);
+  if (loading) {
+    return <Loading />;
+  }
+
+  const recipe = recipes.find(recipe => recipe.id === parseInt(id));
+
+  if (!recipe) {
+    return <div className="min-h-screen bg-gray-900 text-white p-6 flex items-center justify-center">Recipe not found</div>;
+  }
+
+  const handleReviewSubmit = async (e) => {
+    e.preventDefault();
+    if (rating > 0 && comment && title) {
+      const token = localStorage.getItem('accessToken');
+      if (!token) {
+        console.error('No token found');
+        return;
       }
-    };
 
-    fetchRecipe();
-  }, [id]);
+      try {
+        const response = await axios.post(`http://localhost:8000/api/recipes/${id}/reviews/`, {
+          rating,
+          comment,
+          title,
+        }, {
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        console.log('Review submitted successfully:', response.data);
+        // Add the new review to the recipe's reviews array
+        recipe.reviews.push(response.data);
+        setRating(0);
+        setComment('');
+        setTitle('');
+      } catch (error) {
+        console.error('Error submitting review:', error.response ? error.response.data : error.message);
+      }
+    }
+  };
 
-  if (!recipe) return <p>Loading...</p>;
+  const handleShare = (platform) => {
+    let url = window.location.href;
+    let message = `Check out this recipe: ${recipe.title} on ${url}`;
+
+    switch (platform) {
+      case 'email':
+        window.location.href = `mailto:?subject=Check out this recipe&body=${message}`;
+        break;
+      case 'twitter':
+        window.open(`https://twitter.com/share?text=${encodeURIComponent(message)}`, '_blank');
+        break;
+      case 'facebook':
+        window.open(`https://www.facebook.com/sharer/sharer.php?u=${url}`, '_blank');
+        break;
+      default:
+        setShareMessage('Unsupported platform');
+    }
+  };
+
+  // Split tags string into an array
+  const tagsArray = recipe.tags ? recipe.tags.split(',').map(tag => tag.trim()) : [];
 
   return (
-    <div className="min-h-screen text-white bg-gray-900">
-      <section
-        className="bg-gray-100 py-5 h-screen"
-        style={{ 
-          backgroundImage: `url(${imageUrl})`,
-          backgroundSize: 'cover',
-          backgroundRepeat: 'no-repeat',
-          backgroundPosition: 'center'
-        }}
+    <div className="min-h-screen bg-gray-900 text-white p-6">
+      <div className="container mx-auto">
+        {/* Recipe Card */}
+        <div className="bg-gray-800 p-6 rounded-lg shadow-lg">
+          {/* Recipe Image */}
+          <div className="mb-6">
+            <img src={recipe.image} alt={recipe.title} className="w-full h-96 object-cover rounded-lg shadow-lg" />
+          </div>
+
+          {/* Recipe Title and Tags */}
+<div className="mb-6">
+  <h1 className="text-4xl font-bold mb-2">{recipe.title}</h1>
+  <div className="flex flex-wrap gap-2 mb-4">
+    {tagsArray.map((tag, index) => (
+      <span
+        key={index}
+        className="bg-gray-700 text-gray-300 py-1 px-3 rounded-lg text-sm hover:bg-gray-600 transition"
       >
-        <div className="container mx-auto px-4 flex items-center justify-between h-screen">
-          <div className="md:w-1/2 mt-1 md:mt-0">
-            <div className="text-center md:text-left">
-              <h1 className="text-4xl font-bold text-white mb-4">
-                {recipe.title}
-              </h1>
-              <p className="text-lg text-white mb-4">{recipe.description}</p>
-              <p className="text-sm text-white">Category: {recipe.category}</p>
-              <p className="text-sm text-white">Tags: {recipe.tags}</p>
+        {tag}
+      </span>
+    ))}
+  </div>
+  <p className="text-lg text-gray-400">{recipe.description}</p>
+</div>
+
+          {/* Recipe Metadata */}
+          <div className="mb-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div>
+              <h2 className="text-xl font-semibold">Category</h2>
+              <p className="text-gray-400">{recipe.category}</p>
+            </div>
+            <div>
+              <h2 className="text-xl font-semibold">Cooking Time</h2>
+              <p className="text-gray-400">{recipe.cooking_time} minutes</p>
+            </div>
+            <div>
+              <h2 className="text-xl font-semibold">Prep Time</h2>
+              <p className="text-gray-400">{recipe.prep_time} minutes</p>
+            </div>
+            <div>
+              <h2 className="text-xl font-semibold">Servings</h2>
+              <p className="text-gray-400">{recipe.servings}</p>
+            </div>
+            <div>
+              <h2 className="text-xl font-semibold">Created At</h2>
+              <p className="text-gray-400">{new Date(recipe.created_at).toLocaleDateString()}</p>
+            </div>
+            <div>
+              <h2 className="text-xl font-semibold">Updated At</h2>
+              <p className="text-gray-400">{new Date(recipe.updated_at).toLocaleDateString()}</p>
             </div>
           </div>
-          <div className="md:w-1/2 mt-1 md:mt-0">
-            <img
-              src={imageUrl}
-              alt="Recipe-Picture"
-              className="w-full h-auto max-h-screen object-cover rounded-lg"
-              style={{ maxHeight: '500px' }}
-            />
-          </div>
-        </div>
-      </section>
 
-      {/* Additional Info Section */}
-      <section className="p-8">
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
-          <div className="bg-gray-800 p-4 rounded-lg text-center">
-            <p className="text-lg font-semibold text-white">Cooking Time</p>
-            <p className="text-sm text-white">{recipe.cooking_time} minutes</p>
-          </div>
-          <div className="bg-gray-800 p-4 rounded-lg text-center">
-            <p className="text-lg font-semibold text-white">Prep Time</p>
-            <p className="text-sm text-white">{recipe.prep_time} minutes</p>
-          </div>
-          <div className="bg-gray-800 p-4 rounded-lg text-center">
-            <p className="text-lg font-semibold text-white">Servings</p>
-            <p className="text-sm text-white">{recipe.servings}</p>
-          </div>
-        </div>
-      </section>
-
-      {/* Ingredients List */}
-      <section className="p-8">
-        <h3 className="mb-4 text-3xl font-bold">Ingredients</h3>
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
-          {recipe.ingredients.map((ingredient) => (
-            <div key={ingredient.id} className="bg-gray-800 p-4 rounded-lg">
-              <p>{ingredient.quantity} {ingredient.unit} {ingredient.name}</p>
+          {/* Ingredients */}
+          <div className="mb-6">
+            <h2 className="text-2xl font-bold mb-4">Ingredients</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {recipe.ingredients.map(ingredient => (
+                <div key={ingredient.id} className="bg-gray-900 p-4 rounded-lg shadow-md">
+                  <p className="text-gray-400">{ingredient.quantity} {ingredient.unit} {ingredient.name}</p>
+                </div>
+              ))}
             </div>
-          ))}
-        </div>
-      </section>
+          </div>
 
-      {/* Instructions Section */}
-      <section className="p-8">
-        <h3 className="mb-4 text-3xl font-bold">Instructions</h3>
-        <div className="bg-gray-800 p-4 rounded-lg">
-          <ol className="space-y-4 list-decimal list-inside">
-            {recipe.instructions.map((instruction) => (
-              <li key={instruction.id} className="mb-2">{instruction.instruction_text}</li>
-            ))}
-          </ol>
-        </div>
-      </section>
-
-      {/* Reviews Section */}
-      <section className="p-8">
-        <h3 className="mb-4 text-3xl font-bold">Reviews</h3>
-        <div className="space-y-4">
-          {recipe.reviews.map((review) => (
-            <div key={review.id} className="p-4 bg-gray-800 rounded-lg">
-              <p className="text-lg font-semibold">{review.title}</p>
-              <p className="text-sm">{review.comment}</p>
-              <p className="text-sm text-gray-400">Rating: {review.rating}/5</p>
-              <p className="text-sm text-gray-400">Date: {new Date(review.created_at).toLocaleDateString()}</p>
+          {/* Instructions */}
+          <div className="mb-6">
+            <h2 className="text-2xl font-bold mb-4">Instructions</h2>
+            <div className="space-y-4">
+              {recipe.instructions.map(instruction => (
+                <div key={instruction.id} className="bg-gray-900 p-4 rounded-lg shadow-md">
+                  <p className="text-gray-400">Step {instruction.step_number}: {instruction.instruction_text}</p>
+                </div>
+              ))}
             </div>
-          ))}
+          </div>
+
+          {/* Reviews */}
+          <div className="mb-6">
+            <h2 className="text-2xl font-bold mb-4">Reviews</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {recipe.reviews.slice(0, 6).map(review => (
+                <SmallReviewCard
+                  key={review.id}
+                  profileImage={review.profileImage || 'default-profile-image-url'}
+                  authorName={review.user}
+                  rating={review.rating}
+                  comments={review.comment}
+                />
+              ))}
+            </div>
+          </div>
+
+          {/* Leave a Review and Share Recipe */}
+          <div className="flex flex-col lg:flex-row gap-6 mt-6">
+            {/* Leave a Review */}
+            <div className="bg-gray-800 p-6 rounded-lg shadow-md flex-1">
+              <h2 className="text-2xl font-bold mb-4">Leave a Review</h2>
+              <form onSubmit={handleReviewSubmit}>
+                <div className="flex flex-col gap-4 mb-4">
+                  <label className="text-gray-400">
+                    Title
+                    <input
+                      type="text"
+                      placeholder="Title"
+                      value={title}
+                      onChange={(e) => setTitle(e.target.value)}
+                      className="bg-gray-900 text-white py-2 px-4 rounded w-full mt-1"
+                    />
+                  </label>
+                  <label className="text-gray-400">
+                    Rating
+                    <select
+                      value={rating}
+                      onChange={(e) => setRating(parseInt(e.target.value))}
+                      className="bg-gray-900 text-white py-2 px-4 rounded mt-1"
+                    >
+                      <option value="">Rate this recipe</option>
+                      {[1, 2, 3, 4, 5].map(num => (
+                        <option key={num} value={num}>
+                          {num} Star{num > 1 ? 's' : ''}
+                        </option>
+                      ))}
+                    </select>
+                  </label>
+                  <label className="text-gray-400">
+                    Comment
+                    <textarea
+                      placeholder="Your comment"
+                      value={comment}
+                      onChange={(e) => setComment(e.target.value)}
+                      className="bg-gray-900 text-white py-2 px-4 rounded w-full mt-1"
+                      rows="4"
+                    />
+                  </label>
+                </div>
+                <button
+                  type="submit"
+                  className="bg-blue-600 hover:bg-blue-500 text-white py-2 px-6 rounded"
+                >
+                  Submit Review
+                </button>
+              </form>
+            </div>
+
+            {/* Share Recipe */}
+            <div className="bg-gray-800 p-6 rounded-lg shadow-md flex-1">
+              <h2 className="text-2xl font-bold mb-4">Share this Recipe</h2>
+              <div className="flex flex-col gap-4">
+                <button
+                  className="bg-blue-500 hover:bg-blue-400 text-white py-2 px-4 rounded flex items-center justify-center"
+                  onClick={() => handleShare('twitter')}
+                >
+                  <i className="fab fa-twitter mr-2"></i> Share on Twitter
+                </button>
+                <button
+                  className="bg-blue-700 hover:bg-blue-600 text-white py-2 px-4 rounded flex items-center justify-center"
+                  onClick={() => handleShare('facebook')}
+                >
+                  <i className="fab fa-facebook-f mr-2"></i> Share on Facebook
+                </button>
+                <button
+                  className="bg-gray-700 hover:bg-gray-600 text-white py-2 px-4 rounded flex items-center justify-center"
+                  onClick={() => handleShare('email')}
+                >
+                  <i className="fas fa-envelope mr-2"></i> Share via Email
+                </button>
+              </div>
+              {shareMessage && <p className="mt-4 text-red-400">{shareMessage}</p>}
+            </div>
+          </div>
         </div>
-      </section>
+      </div>
     </div>
   );
 };
 
-export default RecipeDetail;
+export default RecipeDetails;

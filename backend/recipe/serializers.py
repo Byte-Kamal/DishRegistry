@@ -16,6 +16,10 @@ class InstructionSerializer(serializers.ModelSerializer):
 
 
 class ReviewSerializer(serializers.ModelSerializer):
+    recipe = serializers.CharField(source='recipe.title', read_only=True)
+    user = serializers.CharField(source='user.name', read_only=True)
+
+
     class Meta:
         model = Review
         fields = [
