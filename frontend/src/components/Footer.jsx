@@ -10,31 +10,21 @@ const Footer = () => {
           <div className="mb-4 md:mb-0">
             <h1 className="text-2xl font-bold">
               <span className="text-red-500">Dish</span>
-              <span className="text-white">Network</span>
+              <span className="text-white">Registry</span>
             </h1>
           </div>
 
           {/* Navigation Links */}
           <ul className="flex flex-col mb-4 md:flex-row md:mb-0">
             <li className="mb-2 md:mx-4 md:mb-0">
-              <a href="#home" className="hover:text-gray-400">
+              <Link to="/" className="hover:text-gray-400">
                 Home
-              </a>
+              </Link>
             </li>
             <li className="mb-2 md:mx-4 md:mb-0">
               <Link to="/recipes" className="hover:text-gray-400">
                 Recipes
               </Link>
-            </li>
-            <li className="mb-2 md:mx-4 md:mb-0">
-              <a href="#services" className="hover:text-gray-400">
-                Services
-              </a>
-            </li>
-            <li className="mb-2 md:mx-4 md:mb-0">
-              <a href="#contact" className="hover:text-gray-400">
-                Contact Us
-              </a>
             </li>
           </ul>
 

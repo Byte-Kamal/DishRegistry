@@ -31,7 +31,7 @@ const Navbar = () => {
           className="text-3xl font-bold text-white relative group transition-all duration-300"
         >
           <span className="text-red-500">Dish</span>
-          <span className="text-white">Network</span>
+          <span className="text-white">Registry</span>
           <span className="absolute inset-x-0 bottom-0 h-1 bg-gradient-to-r from-orange-500 to-yellow-500 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300"></span>
         </Link>
       </div>

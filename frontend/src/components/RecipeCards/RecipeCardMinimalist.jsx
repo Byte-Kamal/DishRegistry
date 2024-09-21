@@ -4,9 +4,8 @@ import { useNavigate } from 'react-router-dom';
 const RecipeCardMinimalist = ({ recipe }) => {
   const navigate = useNavigate();
 
-  const { title, creator, created_at, description, prep_time, cooking_time, servings } = recipe;
-  const baseURL = "http://localhost:8000/";
-  const imageUrl = `${baseURL}${recipe.image}`;
+  const { title, creator, created_at, description,image, prep_time, cooking_time, servings } = recipe;
+
 
   const handleOnClick = () => {
     navigate(`recipe/${recipe.id}`);
@@ -14,7 +13,7 @@ const RecipeCardMinimalist = ({ recipe }) => {
 
   return (
     <div className="max-w-sm bg-gray-800 text-white shadow-md rounded-lg overflow-hidden">
-      <img className="w-full h-48 object-cover" src={imageUrl} alt={title} />
+      <img className="w-full h-48 object-cover" src={image} alt={title} />
       <div className="p-4">
         <h2 className="text-2xl font-semibold mb-2 text-white">{title}</h2>
         <p className="text-sm text-gray-400 mb-1">By {creator} • {created_at}</p>

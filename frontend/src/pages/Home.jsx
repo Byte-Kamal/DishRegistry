@@ -32,7 +32,7 @@ const Home = () => {
             {/* Hero Section */}
             <div className="hero bg-cover bg-center h-96 flex items-center" style={{ backgroundImage: 'url(https://images.pexels.com/photos/1907227/pexels-photo-1907227.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1)' }}>
                 <div className="container mx-auto text-left px-6">
-                    <h1 className="text-5xl font-bold mb-4">Welcome to the Recipe Website</h1>
+                    <h1 className="text-5xl font-bold mb-4">Welcome to the DishRegistry</h1>
                     <p className="text-xl mb-6">Discover delicious recipes and culinary inspiration</p>
                     <button className="bg-blue-500 text-white px-4 py-2 rounded" onClick={()=> handleSubmit()}>Get Started</button>
                 </div>
@@ -46,7 +46,7 @@ const Home = () => {
                         <OverlayRecipeCard
                             key={recipe.id}
                             id={recipe.id}
-                            image={recipe.image_url}
+                            image={recipe.image}
                             title={recipe.title}
                         />
                     ))}
@@ -55,13 +55,13 @@ const Home = () => {
 
             {/* Latest Recipes */}
             <div className="p-6 bg-gray-800">
-                <h2 className="text-4xl font-bold mb-6">Latest Recipes</h2>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    <h2 className="text-4xl font-bold mb-6">Latest Recipes</h2>
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     {latestRecipes.map(recipe => (
                         <LatestRecipeCard
                             key={recipe.id}
                             id={recipe.id}
-                            image_url={recipe.image_url}
+                            image={recipe.image}
                             title={recipe.title}
                             description={recipe.description}
                         />
