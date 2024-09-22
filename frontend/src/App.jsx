@@ -7,13 +7,13 @@ import RouteConfig from './routes/RouteConfig';
 function App() {
   return (
     <>
-    <UserProvider>
-      <RecipeProvider>
-        <ReviewProvider>
-          <RouteConfig />
-        </ReviewProvider>
-      </RecipeProvider>
-    </UserProvider>
+      <UserProvider>
+        <RecipeProvider>
+          <ReviewProvider>
+            <RouteConfig />
+          </ReviewProvider>
+        </RecipeProvider>
+      </UserProvider>
     </>
   );
 }

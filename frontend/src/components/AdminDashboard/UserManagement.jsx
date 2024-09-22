@@ -6,7 +6,7 @@ const UserManagement = () => {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
-  const [selectedUser, setSelectedUser] = useState(null); // For modal
+  const [selectedUser, setSelectedUser] = useState(null);
 
   useEffect(() => {
     const fetchUsers = async () => {
@@ -45,7 +45,7 @@ const UserManagement = () => {
   return (
     <div className="p-6 bg-gray-900 text-white min-h-screen">
       <h3 className="text-2xl mb-6">User Management</h3>
-      
+
       <input
         type="text"
         placeholder="Search users..."
@@ -53,7 +53,7 @@ const UserManagement = () => {
         onChange={(e) => setSearchTerm(e.target.value)}
         className="mb-6 p-2 border border-gray-700 bg-gray-800 text-white rounded w-full lg:w-1/2"
       />
-      
+
       <table className="min-w-full bg-gray-800 text-white border-collapse">
         <thead>
           <tr>

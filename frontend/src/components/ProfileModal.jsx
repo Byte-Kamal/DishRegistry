@@ -17,7 +17,7 @@ const ProfileModal = ({ user, onClose }) => {
           <p>
             <span className="font-bold text-gray-400">Email:</span> {user.email}
           </p>
-           <p>
+          <p>
             <span className="font-bold text-gray-400">Role:</span> {user.role}
           </p>
           <p>

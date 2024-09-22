@@ -3,8 +3,8 @@ import React, { useContext, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import SmallReviewCard from '../components/ReviewCard/SmallReviewCard';
 import { RecipeContext } from '../contexts/RecipeContext';
+import Alert from "./Alert";
 import Loading from './Loading';
-
 const RecipeDetails = () => {
   const { id } = useParams();
   const { recipes, loading } = useContext(RecipeContext);
@@ -12,6 +12,7 @@ const RecipeDetails = () => {
   const [comment, setComment] = useState('');
   const [title, setTitle] = useState('');
   const [shareMessage, setShareMessage] = useState('');
+  const [error, setError] = useState(null);
 
   if (loading) {
     return <Loading />;
@@ -29,6 +30,8 @@ const RecipeDetails = () => {
       const token = localStorage.getItem('accessToken');
       if (!token) {
         console.error('No token found');
+        setError('No token found');
+        window.location.href = '/login';
         return;
       }
 
@@ -49,8 +52,10 @@ const RecipeDetails = () => {
         setRating(0);
         setComment('');
         setTitle('');
+        setError(null);
       } catch (error) {
         console.error('Error submitting review:', error.response ? error.response.data : error.message);
+        setError(error.response ? error.response.data.detail : error.message);
       }
     }
   };
@@ -80,6 +85,7 @@ const RecipeDetails = () => {
   return (
     <div className="min-h-screen bg-gray-900 text-white p-6">
       <div className="container mx-auto">
+        {error && <Alert variant="danger">{error}</Alert>}
         {/* Recipe Card */}
         <div className="bg-gray-800 p-6 rounded-lg shadow-lg">
           {/* Recipe Image */}
@@ -88,20 +94,20 @@ const RecipeDetails = () => {
           </div>
 
           {/* Recipe Title and Tags */}
-<div className="mb-6">
-  <h1 className="text-4xl font-bold mb-2">{recipe.title}</h1>
-  <div className="flex flex-wrap gap-2 mb-4">
-    {tagsArray.map((tag, index) => (
-      <span
-        key={index}
-        className="bg-gray-700 text-gray-300 py-1 px-3 rounded-lg text-sm hover:bg-gray-600 transition"
-      >
-        {tag}
-      </span>
-    ))}
-  </div>
-  <p className="text-lg text-gray-400">{recipe.description}</p>
-</div>
+          <div className="mb-6">
+            <h1 className="text-4xl font-bold mb-2">{recipe.title}</h1>
+            <div className="flex flex-wrap gap-2 mb-4">
+              {tagsArray.map((tag, index) => (
+                <span
+                  key={index}
+                  className="bg-gray-700 text-gray-300 py-1 px-3 rounded-lg text-sm hover:bg-gray-600 transition"
+                >
+                  {tag}
+                </span>
+              ))}
+            </div>
+            <p className="text-lg text-gray-400">{recipe.description}</p>
+          </div>
 
           {/* Recipe Metadata */}
           <div className="mb-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -162,7 +168,6 @@ const RecipeDetails = () => {
               {recipe.reviews.slice(0, 6).map(review => (
                 <SmallReviewCard
                   key={review.id}
-                  profileImage={review.profileImage || 'default-profile-image-url'}
                   authorName={review.user}
                   rating={review.rating}
                   comments={review.comment}
@@ -186,6 +191,7 @@ const RecipeDetails = () => {
                       value={title}
                       onChange={(e) => setTitle(e.target.value)}
                       className="bg-gray-900 text-white py-2 px-4 rounded w-full mt-1"
+                      required
                     />
                   </label>
                   <label className="text-gray-400">
@@ -194,6 +200,7 @@ const RecipeDetails = () => {
                       value={rating}
                       onChange={(e) => setRating(parseInt(e.target.value))}
                       className="bg-gray-900 text-white py-2 px-4 rounded mt-1"
+                      required
                     >
                       <option value="">Rate this recipe</option>
                       {[1, 2, 3, 4, 5].map(num => (
@@ -211,6 +218,7 @@ const RecipeDetails = () => {
                       onChange={(e) => setComment(e.target.value)}
                       className="bg-gray-900 text-white py-2 px-4 rounded w-full mt-1"
                       rows="4"
+                      required
                     />
                   </label>
                 </div>

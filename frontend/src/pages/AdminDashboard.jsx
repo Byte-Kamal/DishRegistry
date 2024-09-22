@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import Dashboard from "../components/AdminDashboard/Dashboard";
 import RecipeManagement from "../components/AdminDashboard/RecipeManagement";
 import RecipeReviews from "../components/AdminDashboard/RecipeReviews";
@@ -14,6 +14,15 @@ const AdminDashboard = () => {
   const accessToken = localStorage.getItem("accessToken");
 
   const [activeSection, setActiveSection] = useState("Dashboard");
+
+  useEffect(() => {
+    if (!localStorage.getItem('hasReloaded')) {
+      localStorage.setItem('hasReloaded', 'true');
+      window.location.reload();
+    } else {
+      localStorage.removeItem('hasReloaded');
+    }
+  }, []);
 
   if (loadingRecipe) return <p>Loading recipes...</p>;
   if (loadingReview) return <p>Loading reviews...</p>;

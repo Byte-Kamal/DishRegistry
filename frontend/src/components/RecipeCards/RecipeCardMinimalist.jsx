@@ -1,14 +1,16 @@
+// TODO: Fix recipe search functionality
+
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 
 const RecipeCardMinimalist = ({ recipe }) => {
   const navigate = useNavigate();
 
-  const { title, creator, created_at, description,image, prep_time, cooking_time, servings } = recipe;
+  const { title, creator, created_at, description, image, prep_time, cooking_time, servings } = recipe;
 
 
   const handleOnClick = () => {
-    navigate(`recipe/${recipe.id}`);
+    navigate(`/recipe/${recipe.id}`)
   };
 
   return (

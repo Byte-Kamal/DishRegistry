@@ -19,59 +19,59 @@ const Login = () => {
   }, [navigate]);
 
   const handleSubmit = async (e) => {
-  e.preventDefault();
+    e.preventDefault();
 
-  const formData = {
-    email: emailRef.current.value,
-    password: passwordRef.current.value,
-  };
+    const formData = {
+      email: emailRef.current.value,
+      password: passwordRef.current.value,
+    };
 
-  try {
-    const response = await axios.post(
-      "http://localhost:8000/api-auth/login/",
-      formData,
-      {
-        headers: {
-          "Content-Type": "application/json",
-        },
+    try {
+      const response = await axios.post(
+        "http://localhost:8000/api-auth/login/",
+        formData,
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      const { access, refresh } = response.data;
+      const profileResponse = await axios.get(
+        "http://localhost:8000/api-auth/profile/",
+        {
+          headers: {
+            Authorization: `Bearer ${access}`,
+          },
+        }
+      );
+
+      localStorage.setItem("userGroup", profileResponse.data.role);
+      localStorage.setItem("accessToken", access);
+      localStorage.setItem("refreshToken", refresh);
+      localStorage.setItem("userId", profileResponse.data.id);
+
+      setSuccessMessage("Login successful!");
+      console.log("Success message set:", "Login successful!");
+
+      setTimeout(() => {
+        navigate("/");
+      }, 1000);
+    } catch (error) {
+      if (error.response && error.response.data.detail) {
+        setError(error.response.data.detail);
+      } else {
+        setError("An error occurred during login.");
       }
-    );
-
-    const { access, refresh } = response.data;
-    const profileResponse = await axios.get(
-      "http://localhost:8000/api-auth/profile/",
-      {
-        headers: {
-          Authorization: `Bearer ${access}`,
-        },
-      }
-    );
-
-    localStorage.setItem("userGroup", profileResponse.data.role);
-    localStorage.setItem("accessToken", access);
-    localStorage.setItem("refreshToken", refresh);
-    localStorage.setItem("userId", profileResponse.data.id);
-    
-    setSuccessMessage("Login successful!");
-    console.log("Success message set:", "Login successful!");
-    
-    setTimeout(() => {
-      navigate("/");
-    }, 1000);
-  } catch (error) {
-    if (error.response && error.response.data.detail) {
-      setError(error.response.data.detail);
-    } else {
-      setError("An error occurred during login.");
     }
-  }
-};
+  };
 
 
   return (
     <div className="flex items-center justify-center h-screen bg-gray-900">
       {error && <Alert message={error} onClose={() => setError(null)} />}
-    {successMessage && <SuccessAlert message={successMessage} onClose={() => setSuccessMessage(null)} />}
+      {successMessage && <SuccessAlert message={successMessage} onClose={() => setSuccessMessage(null)} />}
 
       <div className="relative flex w-full max-w-4xl h-[500px] bg-gray-800 shadow-lg rounded-lg overflow-hidden">
         <div className="flex flex-col justify-center flex-1 p-10 text-white">

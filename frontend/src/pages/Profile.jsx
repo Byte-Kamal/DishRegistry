@@ -4,6 +4,8 @@ import React, { useEffect, useState } from 'react';
 const Profile = () => {
     const [user, setUser] = useState(null);
     const accessToken = localStorage.getItem('accessToken');
+    const defaultProfilePicture = 'https://cdn.vectorstock.com/i/500p/77/30/default-avatar-profile-icon-grey-photo-placeholder-vector-17317730.jpg';
+
 
     useEffect(() => {
         const fetchProfile = async () => {
@@ -36,7 +38,7 @@ const Profile = () => {
                 <h2 className="text-4xl font-bold mb-6">Profile</h2>
                 <div className="flex flex-col items-center bg-gray-800 p-6 rounded-lg shadow-lg w-full max-w-md">
                     <img
-                        src={user.profile_picture}
+                        src={user.profile_picture ? user.profile_picture : defaultProfilePicture}
                         alt="Profile"
                         className="w-32 h-32 mb-4 rounded-full border-4 border-gray-700 shadow-lg"
                     />

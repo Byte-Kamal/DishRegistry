@@ -8,12 +8,14 @@ const Dashboard = () => {
   const { recipes, loadingRecipe } = useContext(RecipeContext);
   const { reviews, loadingReview } = useContext(ReviewContext);
   const { users, loadingUser } = useContext(UserContext);
-    console.log(users)
-    console.log(recipes)
-    console.log(reviews)
+
+  console.log(users)
+  console.log(recipes)
+  console.log(reviews)
   if (loadingRecipe) return <p>Loading recipes...</p>;
   if (loadingReview) return <p>Loading reviews...</p>;
   if (loadingUser) return <p>Loading users...</p>;
+
 
   return (
     <div>

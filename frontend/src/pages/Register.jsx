@@ -69,7 +69,7 @@ const Register = () => {
       {alertMessage && (
         <Alert message={alertMessage} onClose={() => setAlertMessage(null)} />
       )}
-          {successMessage && <SuccessAlert message={successMessage} onClose={() => setSuccessMessage(null)} />}
+      {successMessage && <SuccessAlert message={successMessage} onClose={() => setSuccessMessage(null)} />}
 
       <div className="relative flex w-full max-w-4xl h-[500px] bg-gray-800 shadow-lg rounded-lg overflow-hidden">
         <div className="flex flex-col justify-center flex-1 p-10 text-white">

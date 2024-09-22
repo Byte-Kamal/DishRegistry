@@ -13,20 +13,20 @@ export const ReviewProvider = ({ children }) => {
       try {
         const token = localStorage.getItem('accessToken');
         const userGroup = localStorage.getItem('userGroup');
-        if (!token ) {
+        if (!token) {
           setLoading(false);
           return;
         } else if (userGroup !== "Admin") {
           setLoading(false);
           return;
         }
-        
+
         const response = await axios.get("http://localhost:8000/api/reviews/", {
           headers: {
             'Authorization': `Bearer ${token}`
           }
         });
-        
+
         console.log("Reviews fetched:", response.data);
         setReviews(response.data);
       } catch (error) {
@@ -41,9 +41,9 @@ export const ReviewProvider = ({ children }) => {
       }
     };
 
-   
-      fetchReviews();
-  
+
+    fetchReviews();
+
   }, []);
 
   return (

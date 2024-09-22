@@ -3,11 +3,11 @@ import { useNavigate } from 'react-router-dom';
 
 const ViewRecipes = ({ recipes, loading, handleEdit, handleDelete }) => {
 
-    const navigate = useNavigate();
+  const navigate = useNavigate();
 
-    const handleViewRecipe = (id) => {
-        navigate(`/recipe/${id}`);
-    }
+  const handleViewRecipe = (id) => {
+    navigate(`/recipe/${id}`);
+  }
 
   return (
     <div className="flex-1 pl-6">
@@ -41,7 +41,7 @@ const ViewRecipes = ({ recipes, loading, handleEdit, handleDelete }) => {
                   Delete
                 </button>
                 <button
-                onClick={() => handleViewRecipe(recipe.id)}
+                  onClick={() => handleViewRecipe(recipe.id)}
                   className="bg-green-600 hover:bg-green-500 text-white py-2 px-4 rounded"
                 >
                   View Recipe

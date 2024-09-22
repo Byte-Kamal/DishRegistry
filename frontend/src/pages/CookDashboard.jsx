@@ -5,7 +5,7 @@ import ViewRecipes from '../components/CookDashboard/ViewRecipes';
 import { RecipeContext } from '../contexts/RecipeContext';
 
 const CookDashboard = () => {
-    // eslint-disable-next-line
+  // eslint-disable-next-line
   const { recipes, loading } = useContext(RecipeContext);
   const [editRecipeId, setEditRecipeId] = useState(null);
   const [currentView, setCurrentView] = useState('view'); // State to manage current view

@@ -12,10 +12,10 @@ export const UserProvider = ({ children }) => {
       try {
         const token = localStorage.getItem('accessToken')
         const userGroup = localStorage.getItem('userGroup');
-        if (!token){
-            setLoadingUser(false);
-            return;
-        }else if (userGroup !== "Admin") {
+        if (!token) {
+          setLoadingUser(false);
+          return;
+        } else if (userGroup !== "Admin") {
           return;
         }
         const response = await axios.get("http://localhost:8000/api-auth/admin/profiles/", {

@@ -102,7 +102,7 @@ const MealPlannerDashboard = () => {
         <div className="min-h-screen bg-gray-900 text-white p-6 flex">
             {/* Sidebar */}
             <div className="w-1/4 p-4 bg-gray-800 rounded-lg shadow-lg">
-            <h2 className="text-2xl font-bold mb-8 text-center">Meal Planner</h2>
+                <h2 className="text-2xl font-bold mb-8 text-center">Meal Planner</h2>
                 <button
                     onClick={() => setCurrentView('view')}
                     className={`w-full p-3 mb-4 ${currentView === 'view' ? 'bg-blue-600' : 'bg-gray-700'} hover:bg-blue-500 rounded-lg text-lg transition-transform transform hover:scale-105`}

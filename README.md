@@ -8,36 +8,33 @@ DishRegistry is your ultimate destination for discovering, sharing, and organizi
 - [Byte-Kamal](https://github.com/Byte-Kamal)
 
 
+## How to use?
 
-## Demo
-
-Insert gif or link to demo
-
+- Register your profile from the register view
+- Login using the same data as register
+- Home Page for viewing latest recipe and featured recipe
+- Recipes for Getting all the recipes
+- View search to search for recipe based on title, category, tag and ingredients
+- View Profile from navbar for viewing profile details and edit profile and no profile for non-authenticated users
+- View Dashboard for work based on role non-authenticated user and authenticated user group are not-allowed for dashboard view
 
 
 ## Screenshots
 
-![App Screenshot](https://via.placeholder.com/468x300?text=App+Screenshot+Here)
-
-
-
-
-## Roadmap
-
-- Additional browser support
-
-- Add more integrations
-
+### Home Page
+![Home Page](image.png)
+### Recipes
+![Recipes](image/README/1726984918068.png) 
+### Search Results
+![Search Results](image/README/1726984961002.png)
+### Login
+![Login](image/README/1726985075125.png)
+### Register
+![Register](image/README/1726985098375.png)
 
 ## License
 
 [MIT](https://choosealicense.com/licenses/mit/)
-
-
-
-## Lessons Learned
-
-What did you learn while building this project? What challenges did you face and how did you overcome them?
 
 
 
@@ -60,6 +57,10 @@ Setup poetry environment and django for backend and react for frontend.
     mkdir frontend
     cd frontend
     npx create-react-app .
+
+  # Tailwindcss Setup
+    npm install tailwindcss postcss autoprefixer
+    npx init tailwindcss
 ```
 
 
@@ -72,6 +73,9 @@ If you have any feedback, please reach out to us at kdhital132@gmail.com
 ## Features
 
 - Dark mode user friendly
+- Search Recipe using Title, Category, Tags, Ingredients
+- Different Dashboard view for different user group for recipe management, user management and meal planner management
+- Proper Response while login and Register
 
 
 
